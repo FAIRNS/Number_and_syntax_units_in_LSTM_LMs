@@ -9,7 +9,7 @@ Folder structure -
 Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
 
 
-'''
+'''bash
 ├── code
 ├── datasets
 │   ├── NA_tasks
