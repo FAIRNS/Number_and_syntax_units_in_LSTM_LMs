@@ -1,6 +1,5 @@
 The complete set of stimuli together with utility scripts used in the experiments described in: ["The emergence of number and syntax units in LSTM language models" NAACL2019](add link to the paper).
 
-Folder structure - 
 * code:
 * datasets:
   * NA_tasks:  stimuli used in the Number-Agreement tasks.
