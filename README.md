@@ -6,9 +6,6 @@ Folder structure -
   * NA_tasks:  datasets used for the Number-Agreement tasks,
   * Tree_depth: the dataset used for predicting the syntactic tree depth (number of open nodes) from LSTM activity.
 
-Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
-
-
 ```bash
 ├── code
 ├── datasets
@@ -27,3 +24,5 @@ Pre-trained LSTM models and datasets used for training and evaluating the LSTM l
 ├── README.md
 └── supplementary_material.pdf
 ```
+
+Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
