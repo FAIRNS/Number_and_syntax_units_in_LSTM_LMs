@@ -4,6 +4,7 @@ Folder structure -
 * code: evaluation script.
 * datasets:
   * NA_tasks:  datasets used for the Number-Agreement tasks,
-  * Syntax_number_of_open_nodes: the dataset used for predicting the syntactic tree depth from LSTM activity.
+  * Tree_depth: the dataset used for predicting the syntactic tree depth (number of open nodes) from LSTM activity.
 
-
+Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found here - 
+https://github.com/facebookresearch/colorlessgreenRNNs
