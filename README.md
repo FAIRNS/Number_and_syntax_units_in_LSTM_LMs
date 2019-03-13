@@ -3,8 +3,8 @@ The complete set of stimuli used in the experiments described in: ["The emergenc
 Folder structure - 
 * code: evaluation script.
 * datasets:
-  * NA_tasks:  datasets used for the Number-Agreement tasks,
-  * Tree_depth: the dataset used for predicting the syntactic tree depth (number of open nodes) from LSTM activity.
+  * NA_tasks:  stimuli used in the Number-Agreement tasks.
+  * Tree_depth: stimuli, parses and corresponding number of open nodes used for predicting syntactic tree depth from LSTM activity.
 
 ```bash
 ├── code
