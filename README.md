@@ -7,3 +7,24 @@ Folder structure -
   * Tree_depth: the dataset used for predicting the syntactic tree depth (number of open nodes) from LSTM activity.
 
 Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
+
+
+'''
+├── code
+├── datasets
+│   ├── NA_tasks
+│   │   ├── adv_adv.txt
+│   │   ├── adv_conjunction.txt
+│   │   ├── adv.txt
+│   │   ├── namepp.txt
+│   │   ├── nounpp_adv.txt
+│   │   ├── nounpp.txt
+│   │   ├── readme.md
+│   │   └── simple.txt
+│   └── tree_depth
+│       ├── filtered_sentences.txt
+│       └── readme.md
+├── README.md
+└── supplementary_material.pdf
+
+'''
