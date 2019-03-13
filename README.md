@@ -24,4 +24,4 @@ The complete set of stimuli together with utility scripts used in the experiment
 └── supplementary_material.pdf
 ```
 
-Pre-trained LSTM models and datasets used for training and evaluating the LSTM language models can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
+Pre-trained LSTM language models together with the corresponding datasets used for their training and evaluations can be found [here](https://github.com/facebookresearch/colorlessgreenRNNs)
