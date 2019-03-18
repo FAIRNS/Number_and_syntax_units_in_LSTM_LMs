@@ -1,12 +1,10 @@
 The complete set of stimuli together with utility scripts used in the experiments described in: ["The emergence of number and syntax units in LSTM language models" NAACL2019](add link to the paper).
 
-* code:
 * datasets:
   * NA_tasks:  stimuli used in the Number-Agreement tasks.
   * Tree_depth: stimuli, parses and corresponding number of open nodes used for predicting syntactic tree depth from LSTM activity.
 
 ```bash
-├── code
 ├── datasets
 │   ├── NA_tasks
 │   │   ├── adv_adv.txt
