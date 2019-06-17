@@ -1,4 +1,6 @@
-The complete set of stimuli together with utility scripts used in the experiments described in: ["The emergence of number and syntax units in LSTM language models" NAACL2019](https://arxiv.org/abs/1903.07435).
+This repo contains:
+- The complete set of stimuli together with utility scripts used in the experiments described in: ["The emergence of number and syntax units in LSTM language models" NAACL2019](https://arxiv.org/abs/1903.07435).
+- Code and instructions required for repliacting the figures in the paper - see [Code](/Code/)
 
 * datasets:
   * NA_tasks:  stimuli used in the Number-Agreement tasks.
