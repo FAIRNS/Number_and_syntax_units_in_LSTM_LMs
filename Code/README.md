@@ -27,11 +27,11 @@ Data organization
 - Before running the example below for the *Nounpp* task, make sure that the model and its vocabulary are saved in *Data/models/*. You can find on the [colorlessGreenRnns repo](https://github.com/facebookresearch/colorlessgreenRNNs/tree/master/data) both the [english_model](https://dl.fbaipublicfiles.com/colorless-green-rnns/best-models/English/hidden650_batch128_dropout0.2_lr20.0.pt) and the [vocabulary](https://dl.fbaipublicfiles.com/colorless-green-rnns/training-data/English/vocab.txt).
 
 1. Generate a dataset for the number-agreement task (NA-task):  
-Instead of using one of the files in */Datasets/*, you could also generate data for an NA-task by using the script *generate_NA_task.pl*, for example, for the *Nounpp* task, run:
-./Code/generate_NA_task.pl 0 1000 nounpp > Data/Stimuli/nounpp.txt
+Instead of using one of the files in */Datasets/*, you could also generate data for an NA-task by using the script *generate_NA_task.pl*, for example, for the *Nounpp* task, run:  
+`./Code/generate_NA_task.pl 0 1000 nounpp > Data/Stimuli/nounpp.txt`
 
 2. You can look into the statistics of the generated file by running:  
-python Code/verify_stimuli_file_is_balanced.py -f Data/Stimuli/nounpp.txt > Data/Stimuli/nounpp.log
+`python Code/verify_stimuli_file_is_balanced.py -f Data/Stimuli/nounpp.txt > Data/Stimuli/nounpp.log`
 
 3. The result *nounpp.txt* should then be transformed into three files:
 - \*.text: file containing only the sentence stimuli.
@@ -43,22 +43,22 @@ python Code/generate_info_from_raw_txt.py -i Data/Stimuli/nounpp.txt -o Data/Sti
 This will result in three files in Data/Stimuli/: nounpp.text, nounpp.gold and nounpp.info 
 
 4. You can get the 'behavioral' performance of the LSTM on this NA-task, by running:  
-python Code/extract_predictions.py Data/LSTM/models/hidden650_batch128_dropout0.2_lr20.0.pt -i Data/Stimuli/nounpp -v Data/LSTM/models/vocab.txt -o Output/nounpp --eos-separator "\<eos\>" --format pkl --lang en --uppercase-first-word
+`python Code/extract_predictions.py Data/LSTM/models/hidden650_batch128_dropout0.2_lr20.0.pt -i Data/Stimuli/nounpp -v Data/LSTM/models/vocab.txt -o Output/nounpp --eos-separator "\<eos\>" --format pkl --lang en --uppercase-first-word`
 
 * Note that the pytorch model and vocab are assumed to be in *Data/LSTM/models/*
 * you can use a GPU by adding a --cuda flag to the command.
 
 Following this, run:  
-python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=singular number_2=singular  
-python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=singular number_2=plural  
-python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=plural number_2=singular  
-python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=plural number_2=plural  
+`python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=singular number_2=singular`  
+`python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=singular number_2=plural`  
+`python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=plural number_2=singular`  
+`python Code/get_agreement_accuracy_for_contrast.py -ablation-results Output/nounpp.abl -info Data/Stimuli/nounpp.info -condition number_1=plural number_2=plural`  
 
 5. Next, gate and unit activations should be extracted from the model. This is done by running:  
-python Code/extract-activations.py Data/LSTM/models/hidden650_batch128_dropout0.2_lr20.0.pt -i Data/Stimuli/nounpp.text -v Data/LSTM/models/vocab.txt -o Data/LSTM/activations/nounpp --eos-separator "\<eos\>" --lang en --use-unk
+`python Code/extract-activations.py Data/LSTM/models/hidden650_batch128_dropout0.2_lr20.0.pt -i Data/Stimuli/nounpp.text -v Data/LSTM/models/vocab.txt -o Data/LSTM/activations/nounpp --eos-separator "\<eos\>" --lang en --use-unk`
 
 6. Add model performance to metadata file:  
-python Code/add_success_and_perplexity_to_info.py -i Data/Stimuli/nounpp.info -r Output/nounpp.abl -a Data/LSTM/activations/nounpp.pkl
+`python Code/add_success_and_perplexity_to_info.py -i Data/Stimuli/nounpp.info -r Output/nounpp.abl -a Data/LSTM/activations/nounpp.pkl`
 
 # PART 2 - Regenerate figures 1-4 in the paper:
 ----------------------------------------------
