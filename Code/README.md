@@ -17,10 +17,10 @@ Part 2 describes the scripts required for regenerating figures 1-4 in the paper.
 
 
 
-# PART 1 - data organization and extraction of LSTM activations:
+# PART 1 - Data organization and extraction of LSTM activations:
 -------------------------------------------------------------
 
-data organization
+Data organization
 -----------------
 0. Prepare folders and Save model and its vocabulary:  
 - After cloning the repository, you should create the following folders in your project: */Data/Stimuli/*, */Data/LSTM/activations/*, */Data/LSTM/models/*, */Output/* and */Figures/*.
@@ -60,7 +60,7 @@ python Code/extract-activations.py Data/LSTM/models/hidden650_batch128_dropout0.
 6. Add model performance to metadata file:  
 python Code/add_success_and_perplexity_to_info.py -i Data/Stimuli/nounpp.info -r Output/nounpp.abl -a Data/LSTM/activations/nounpp.pkl
 
-# PART 2 - regenerate figures 1-4 in the paper:
+# PART 2 - Regenerate figures 1-4 in the paper:
 ----------------------------------------------
 
 The scripts in this part require that:
