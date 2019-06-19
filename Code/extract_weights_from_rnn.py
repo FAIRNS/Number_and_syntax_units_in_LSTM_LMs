@@ -11,18 +11,15 @@ import lstm
 import networkx as nx
 
 parser = argparse.ArgumentParser(description='Extract and plot LSTM weights')
-parser.add_argument('-model', type=str, help='Meta file stored once finished training the corpus')
+parser.add_argument('-model', default='../Data/LSTM/models/hidden650_batch128_dropout0.2_lr20.0.pt', type=str, help='Meta file stored once finished training the corpus')
 parser.add_argument('-activations', '--LSTM-file-name', type=str, default = [], help='The corresponding sentence (LSTM) activations')
 parser.add_argument('-o', '--output', help='Destination for the output weights')
-parser.add_argument('-fu', '--from-units', nargs='+', type=int, default=[], help='Weights FROM which units (counting from zero)')
-parser.add_argument('-tu', '--to-units', nargs='+', type=int, default=[], help='Weights TO which units (counting from zero)')
+parser.add_argument('-fu', '--from-units', nargs='+', type=int, default=[775, 987], help='Weights FROM which units (counting from zero)')
+parser.add_argument('-tu', '--to-units', nargs='+', type=int, default=[775, 987, 1149], help='Weights TO which units (counting from zero)')
 parser.add_argument('-c', '--colors', nargs='+', help='corresponding colors for each unit in the TO-UNITS.')
 parser.add_argument('-l', '--labels', nargs='+', help='corresponding label for each unit in the TO-UNITS.')
 parser.add_argument('--no-mds', action='store_true', default=False)
 args = parser.parse_args()
-#parser.add_argument('-sr', '--short-range', nargs='+', type=int, default=[], help='list of short-range numebr units')
-#parser.add_argument('-lr', '--long-range', nargs='+', type=int, default=[], help='list of long-range numebr units')
-#parser.add_argument('-sy', '--syntax', nargs='+', type=int, default=[], help='list of syntax units')
 
 if args.colors is not None:
     assert len(args.to_units) == len(args.colors), "!!!---Number of colors is not equal to number of to-units---!!!"
@@ -88,7 +85,7 @@ def get_weight_between_two_units(model, gate, from_unit, to_unit):
     weights_nn = getattr(model.rnn, weight_type)
     weight = weights_nn.data[gate * 650 + to_unit, from_unit]
 
-    return weight
+    return weight.numpy()
 
 
 def plot_hist_all_weights_with_arrows_for_units_of_interest(axes, weights_all, weight_of_interest, weight_names, layer, gate, arrow_dy=100):
@@ -143,7 +140,6 @@ def generate_mds_for_connectivity(curr_ax, weights, layer, gate, from_units, to_
     gate_names = ['Input', 'Forget', 'Cell', 'Output']
     print('MDS for weights: layer - ' + layer_names[layer] + ', gate -' + gate_names[gate])
     seed = np.random.RandomState(seed=3)
-    # A = np.abs(weights[gate])
     A = np.abs(weights)
     A = np.maximum(A, A.transpose())
     A = np.exp(-A)
@@ -151,10 +147,7 @@ def generate_mds_for_connectivity(curr_ax, weights, layer, gate, from_units, to_
     mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
                        dissimilarity="precomputed", n_jobs=-2)
 
-    # print('fitting MDS')
     pos = mds.fit(A).embedding_
-    # print('Done')
-    # fig_mds, ax = plt.subplots(figsize=(40, 30))
     for i in range(650):
         # default style:
         c = 'k'; label = 'unidentified'; s = 5; fontweight = 'light'
@@ -164,26 +157,11 @@ def generate_mds_for_connectivity(curr_ax, weights, layer, gate, from_units, to_
             c = args.colors[IX] if (args.colors is not None) else 'b'
             label = args.labels[IX] if (args.labels is not None) else 'unit'
             fontweight = 'bold'
-        #if i in [u-650 for u in args.syntax]:
-        #    c = 'g'; label = 'syntax unit'; s = 12; fontweight = 'bold'
-        #elif i in [u-650 for u in args.short_range]:
-        #    c = 'm'; label = 'LR unit'; s = 12; fontweight = 'bold'
-        #elif i in [u-650 for u in args.long_range]:
-        #    c = 'c'; label = 'number unit'; s = 12; fontweight = 'bold'
-        #elif i == 987-650:
-        #    c = 'r'; label = 'number unit'; s = 12; fontweight = 'bold'
-        #elif i == 775-650:
-        #    c = 'b'; label = 'number unit'; s = 12; fontweight = 'bold'
-        #elif i == 1149-650:
-        #    c = 'g'; label = 'syntax unit'; s = 12; fontweight = 'bold'
 
         curr_ax.text(pos[i, 0], pos[i, 1], str(1 + i + layer*650), color=c, label=label, size=s, fontweight=fontweight)
         curr_ax.set_xlim(np.min(pos[:, 0]), np.max(pos[:, 0]))
     curr_ax.set_ylim(np.min(pos[:, 1]), np.max(pos[:, 1]))
     curr_ax.axis('off')
-    # curr_ax.set_title('Layer: ' + layer_names[layer] + ', Gate:' + gate_names[gate], fontsize=30)
-    # plt.savefig(args.output + '_gate_' + str(gate) + '_layers_' + str(layer) + '.mds.png')
-    # plt.close(fig_mds)
 
 
 def plot_graph_for_connectivity(weights, layer, gate, from_units, to_units):
@@ -191,8 +169,6 @@ def plot_graph_for_connectivity(weights, layer, gate, from_units, to_units):
     gate_names = ['Input', 'Forget', 'Cell', 'Output']
     print('generating weights graph for: layer - ' + layer_names[layer] + ', gate -' + gate_names[gate])
 
-    # thresh = 5*np.std(weights[gate].flatten())
-    # mask = np.logical_or(weights[gate]>thresh, weights[gate]<-thresh).astype(int)
 
     A = np.abs(weights[gate])
     A = np.exp(-np.abs(recurrent_weights_l1_all[0])) # weighted adjacency matrix (LSTM weights are transformed to distance)
@@ -235,7 +211,7 @@ model = torch.load(args.model, map_location=lambda storage, loc: storage)
 #    model = torch.load(args.model)
 
 model.rnn.flatten_parameters()
-# print(model.rnn._all_weights)
+
 ###### Load LSTM activations, stimuli and meta-data ############
 if args.LSTM_file_name:
     print('Loading pre-trained LSTM data...')
@@ -256,117 +232,9 @@ bar_width = 0.4
 rowLabels = [str(u+1) for u in args.from_units]
 colLabels = [str(u+1) for u in args.to_units]
 for gate in range(4):
-    print('\n\n' + '-'*50)
-    print('--------' + gate_names[gate] + '-'*30)
-    print('-'*50)
-    colors = []
-    # Create a table at the bottom-left of the figure
-    fig, ax1 = plt.subplots(1, figsize = (10, 3)) # Top-left distrubtions
-    ax2 = fig.add_axes([0.5, 0.19, 0.4, 0.14])  # for 5 units: 0.5, 0.12, 0.4, 0.195 # Bottom-right distrubtions
-    cell_text = np.empty((len(args.from_units), len(args.to_units)))
-    jitter_to = []; jitter_from = []
-    
-    print('\n Efferent weights \n ---------------------')
-    for i, from_unit in enumerate(args.from_units):
-        # Plot right distribution
-        all_weights_from_curr_unit = model.rnn.weight_hh_l1.data[gate * 650:(gate + 1) * 650, from_unit - 650].numpy()
-        top_5_units = 650 + np.argsort(np.negative(np.absolute(all_weights_from_curr_unit)))[0:5]
-        top_5_weights = all_weights_from_curr_unit[top_5_units-650]
-        print('Top 5 (abs) weights from unit ' + str(from_unit), top_5_units, top_5_weights)
-        colors_row = []
-        for j, to_unit in enumerate(args.to_units):
-            all_weights_to_curr_unit = model.rnn.weight_hh_l1.data[(to_unit - 650) + gate * 650, :].numpy()
-            all_weights_to_curr_unit = np.multiply(all_weights_to_curr_unit, np.asarray(max_activations))
-            if i == len(args.from_units)-1:
-                if j==0:
-                    print('\n Afferent weights \n ------------')
-                top_5_units = 650 + np.argsort(np.negative(np.absolute(all_weights_to_curr_unit)))[0:5]
-                top_5_weights = all_weights_to_curr_unit[top_5_units - 650]
-                print('Top 5 (abs) recurrent weights to unit ' + str(to_unit), top_5_units, top_5_weights)
-                weights = model.rnn.weight_ih_l1.data[(to_unit - 650) + gate * 650, :].numpy()
-                top_5_units = np.argsort(np.negative(np.absolute(weights)))[0:5]
-                top_5_weights = weights[top_5_units]
-                print('Top 5 (abs) input weights from layer-1 to unit ' + str(to_unit), top_5_units, top_5_weights)
 
-            # Plot top distributions
-            # Set style if in TO-UNITS:
-            IX = args.to_units.index(to_unit)
-            c = args.colors[IX] if (args.colors is not None) else 'b'
-            label = args.labels[IX] if (args.labels is not None) else 'unit'
-            fontweight = 'bold'
-            if i == 0:
-                jitter_to.append(np.random.random(all_weights_to_curr_unit.size) * bar_width - 3 * bar_width / 4)
-                ax1.scatter(j + jitter_to[j], all_weights_to_curr_unit, s=3, color=c)
-            # Plot right-side distribution
-            if j == 0:
-                IX = args.to_units.index(from_unit)
-                c = args.colors[IX] if (args.colors is not None) else 'b'
-                label = args.labels[IX] if (args.labels is not None) else 'unit'
-                fontweight = 'bold'
-                num_from_units = cell_text.shape[0]
-                jitter_from.append(np.random.random(all_weights_from_curr_unit.size) * bar_width - bar_width / 2)
-                ax2.scatter(all_weights_from_curr_unit, num_from_units - i + jitter_from[i], s=1, color=c)
-            # Get weight
-            curr_weight = get_weight_between_two_units(model, gate, from_unit, to_unit)
-
-            # If weight is outlier color it in table and dists
-            outlier_to, outlier_from = check_if_weight_is_outlier(curr_weight, all_weights_to_curr_unit,
-                                                                  all_weights_from_curr_unit, max_activations[from_unit - 650])
-
-
-            if outlier_to and i!=j:
-                #IX_from = np.where(all_weights_from_curr_unit == curr_weight)
-                #print(jitter_from, IX_from)
-                #ax2.scatter(curr_weight, num_from_units - i + jitter_from[i][IX_from[0][0]], color='r', s=3)
-                colors_row.append('#56b5fd')
-            else:
-                colors_row.append('w')
-
-            curr_weight = curr_weight * max_activations[from_unit - 650]
-            # if i!=j:
-            cell_text[i, j] = '%1.2f' % curr_weight
-
-            if outlier_to:
-                IX_to = np.where(all_weights_to_curr_unit == curr_weight)
-                #if i != j: ax1.scatter(j + jitter_to[j][IX_to[0][0]], curr_weight, color='r', s=3)
-                #if from_unit == 1149: # Mark weights from 1149
-                #    if i != j: ax1.text(j, curr_weight, str(from_unit) + '-' + str(to_unit), fontsize=8)
-
-
-        colors.append(colors_row)
-
-    the_table = ax1.table(cellText=cell_text,
-                          rowLabels=rowLabels,
-                          colLabels=colLabels, rowLoc='center', cellColours=colors,
-                          loc='bottom')
-    the_table.set_fontsize(6)
-
-    ### Add MDS to upper-right part of the figures
-    if not args.no_mds:
-        ax3 = fig.add_axes([0.52, 0.37, 0.4, 0.46])
-        recurrent_weights_l1_all = model.rnn.weight_hh_l1.data[range(gate * 650, (gate + 1) * 650), :].numpy()
-        generate_mds_for_connectivity(ax3, recurrent_weights_l1_all, 1, gate, from_units_l1, to_units_l1)
-
-    ### cosmetics
-    # ax1.set_ylim((-2, 2))
-    # ax2.set_xlim((-2, 2))
-    ax1.get_xaxis().set_visible(False)
-    ax2.get_yaxis().set_visible(False)
-    ax1.set_ylabel('Weight size (afferent)', fontsize=12)
-    ax2.set_xlabel('Weight size (efferent)', fontsize=12)
-    # ax2.xaxis.set_label_position('top')
-    plt.subplots_adjust(bottom=0.42, right=0.5)
-    ax1.set_title(gate_names[gate])
-
-    ### Save figure
-    dirname = os.path.dirname(args.output)
-    basename = os.path.basename(args.output)
-    fig.savefig(os.path.join(dirname, 'gate_' + gate_names[gate] + '_' + basename))
-    #print('\nFigures saved to: ' + os.path.join(dirname, 'gate_' + gate_names[gate] + '_' + basename))
-    # print(the_table.get_window_extent('Agg'))
-
-####################################################################################
-    ############# Re-generate the figure but only with afferent distributions
+    ################################################################################
+    ############# Generate the figure but only with afferent distributions
     ################################################################################
     # Create a table at the bottom-left of the figure
     colors = []
@@ -457,6 +325,6 @@ for gate in range(4):
     dirname = os.path.dirname(args.output)
     basename = os.path.basename(args.output)
     fig.savefig(os.path.join(dirname, 'gate_' + gate_names[gate] + '_afferent_' + basename))
-    fig.savefig(os.path.join(dirname, 'gate_' + gate_names[gate] + '_afferent_' + basename[:-4]+'.pdf'))
+    #fig.savefig(os.path.join(dirname, 'gate_' + gate_names[gate] + '_afferent_' + basename[:-4]+'.pdf'))
     print('\nFigures saved to: ' + os.path.join(dirname, 'gate_' + gate_names[gate] + '_' + basename))
     # print(the_table.get_window_extent('Agg'))
